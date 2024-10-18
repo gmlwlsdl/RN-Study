@@ -10,7 +10,7 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
-        <Stack.Screen name="Splash" component={Splash} />
+        <Stack.Screen name="Splash" component={Splash} options={{}} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Settings" component={Settings} />
       </Stack.Navigator>

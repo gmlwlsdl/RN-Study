@@ -4,7 +4,7 @@ import {
   ParamListBase,
 } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 
 type SplashProps = {
   Home: undefined
@@ -15,10 +15,13 @@ export default function Splash() {
   const navigation = useNavigation<NavigationProp<SplashProps>>()
 
   return (
-    <>
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-        <Text>Go to Home</Text>
+    <View className="flex-1 items-center justify-center bg-black">
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Home')}
+        className="w-fit h-auto bg-slate-400 rounded-md"
+      >
+        <Text className="text-white text-xl px-1">Go to Home</Text>
       </TouchableOpacity>
-    </>
+    </View>
   )
 }
