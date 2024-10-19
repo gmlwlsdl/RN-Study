@@ -1,12 +1,19 @@
 import React, { useState } from 'react'
-import { SafeAreaView, View, Text, FlatList, Pressable } from 'react-native'
+import {
+  SafeAreaView,
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  Alert,
+} from 'react-native'
 import cn from '../utils/cn'
 import { TextInput } from 'react-native-gesture-handler'
 import Entypo from '@expo/vector-icons/Entypo'
 
 type TodoListProps = {
   item: itemData
-  onPress: () => void
+  onDelete: () => void
   backgroundColor: boolean
 }
 
@@ -21,7 +28,7 @@ const initialData: itemData[] = [
   { id: '3', text: 'Subscribe 🍀' },
 ]
 
-const TodoList = ({ item, onPress, backgroundColor }: TodoListProps) => (
+const TodoList = ({ item, onDelete, backgroundColor }: TodoListProps) => (
   <View
     className={cn(
       'flex flex-row items-center bg-slate-50 rounded-lg',
@@ -37,7 +44,7 @@ const TodoList = ({ item, onPress, backgroundColor }: TodoListProps) => (
       className={`w-4 h-4 rounded-full border-cyan-300 border-2 ${
         backgroundColor === true ? 'bg-cyan-300' : ''
       }`}
-      onPress={onPress}
+      onPress={onDelete}
     ></Pressable>
   </View>
 )
@@ -45,17 +52,37 @@ const TodoList = ({ item, onPress, backgroundColor }: TodoListProps) => (
 export default function Todo() {
   const [selectedId, setSelectedId] = useState<string>()
   const [data, setData] = useState<itemData[]>(initialData)
+  const [newTask, setNewTask] = useState<string>('')
 
   const renderItem = ({ item }: { item: itemData }) => {
     const backgroundColor = item.id === selectedId ? true : false
 
+    const deleteTodo = () => {
+      setData((prevData) => prevData.filter((Todo) => Todo.id != item.id))
+    }
+
     return (
       <TodoList
         item={item}
-        onPress={() => setSelectedId(item.id)}
+        onDelete={deleteTodo}
         backgroundColor={backgroundColor}
       />
     )
+  }
+
+  const addTodo = () => {
+    if (newTask.trim() === '') {
+      Alert.alert('Please write a task before adding')
+      return
+    }
+
+    const newTodo: itemData = {
+      id: (data.length + 1).toString(),
+      text: newTask,
+    }
+
+    setData((prevData) => [...prevData, newTodo])
+    setNewTask('')
   }
 
   return (
@@ -64,7 +91,7 @@ export default function Todo() {
         <View className="flex-1">
           <Text className="text-2xl font-bold">Today's tasks</Text>
           <FlatList
-            data={initialData}
+            data={data}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             extraData={selectedId}
@@ -73,10 +100,15 @@ export default function Todo() {
         </View>
         <View className="flex-row items-center gap-8 shadow-sm">
           <TextInput
+            value={newTask}
+            onChangeText={setNewTask}
             placeholder="Write a task"
             className="flex-grow h-12 bg-white rounded-3xl placeholder:text-center"
           />
-          <Pressable className="flex-none w-16 h-16 bg-white rounded-full justify-center items-center">
+          <Pressable
+            onPress={addTodo}
+            className="flex-none w-16 h-16 bg-white rounded-full justify-center items-center"
+          >
             <Entypo name="plus" size={40} color="#e4e4e7" />
           </Pressable>
         </View>
