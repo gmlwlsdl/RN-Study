@@ -1,11 +1,11 @@
 import { View } from 'react-native'
-import GoBtn from '../components/GoBtn'
+import GoBtn from '../components/Splash/GoBtn'
 
 export default function Splash() {
   return (
-    <View className="flex-1 items-center justify-center bg-black">
+    <View className="flex-1 items-center justify-center">
       <GoBtn title="home" />
-      <GoBtn title="setting" />
+      <GoBtn title="todo" />
     </View>
   )
 }

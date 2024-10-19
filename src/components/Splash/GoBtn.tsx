@@ -21,16 +21,16 @@ export default function GoBtn({ title }: GoBtnProps) {
   const handlePress = () => {
     if (title === 'home') {
       navigation.navigate('Home')
-    } else if (title === 'setting') {
-      navigation.navigate('Settings')
+    } else if (title === 'todo') {
+      navigation.navigate('Todo')
     }
   }
 
   return (
     <TouchableOpacity
       onPress={handlePress}
-      className={`w-fit h-auto bg-slate-400 rounded-md ${
-        title === 'setting' ? 'mt-4' : ''
+      className={`w-fit h-auto bg-black rounded-md ${
+        title === 'todo' ? 'mt-4' : ''
       }`}
     >
       <Text className="text-white text-xl px-1">Go to {title}</Text>
