@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { SafeAreaView, View, Text, FlatList, Pressable } from 'react-native'
 import cn from '../utils/cn'
+import { TextInput } from 'react-native-gesture-handler'
+import Entypo from '@expo/vector-icons/Entypo'
 
 type TodoListProps = {
   item: itemData
@@ -13,7 +15,7 @@ type itemData = {
   text: string
 }
 
-const Data: itemData[] = [
+const initialData: itemData[] = [
   { id: '1', text: 'Like 👍' },
   { id: '2', text: 'Comment 📢' },
   { id: '3', text: 'Subscribe 🍀' },
@@ -42,6 +44,7 @@ const TodoList = ({ item, onPress, backgroundColor }: TodoListProps) => (
 
 export default function Todo() {
   const [selectedId, setSelectedId] = useState<string>()
+  const [data, setData] = useState<itemData[]>(initialData)
 
   const renderItem = ({ item }: { item: itemData }) => {
     const backgroundColor = item.id === selectedId ? true : false
@@ -57,15 +60,26 @@ export default function Todo() {
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-200">
-      <View className="py-4 px-6">
-        <Text className="text-2xl font-bold">Today's tasks</Text>
-        <FlatList
-          data={Data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          extraData={selectedId}
-          className="mt-7"
-        />
+      <View className="flex-1 justify-between py-4 px-6">
+        <View className="flex-1">
+          <Text className="text-2xl font-bold">Today's tasks</Text>
+          <FlatList
+            data={initialData}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            extraData={selectedId}
+            className="mt-7"
+          />
+        </View>
+        <View className="flex-row items-center gap-8 shadow-sm">
+          <TextInput
+            placeholder="Write a task"
+            className="flex-grow h-12 bg-white rounded-3xl placeholder:text-center"
+          />
+          <Pressable className="flex-none w-16 h-16 bg-white rounded-full justify-center items-center">
+            <Entypo name="plus" size={40} color="#e4e4e7" />
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   )
