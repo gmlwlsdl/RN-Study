@@ -86,8 +86,8 @@ export default function Todo() {
       isPressed: false,
     }
 
-    setData((prevData) => [...prevData, newTodo])
     setNewTask('')
+    setData((prevData) => [...prevData, newTodo])
   }
 
   return (
