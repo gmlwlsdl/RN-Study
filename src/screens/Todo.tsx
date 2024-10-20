@@ -13,22 +13,22 @@ import Entypo from '@expo/vector-icons/Entypo'
 
 type TodoListProps = {
   item: itemData
-  onDelete: () => void
-  backgroundColor: boolean
+  onPress: () => void
 }
 
 type itemData = {
   id: string
   text: string
+  isPressed: boolean
 }
 
 const initialData: itemData[] = [
-  { id: '1', text: 'Like 👍' },
-  { id: '2', text: 'Comment 📢' },
-  { id: '3', text: 'Subscribe 🍀' },
+  { id: '1', text: 'Like 👍', isPressed: false },
+  { id: '2', text: 'Comment 📢', isPressed: false },
+  { id: '3', text: 'Subscribe 🍀', isPressed: false },
 ]
 
-const TodoList = ({ item, onDelete, backgroundColor }: TodoListProps) => (
+const TodoList = ({ item, onPress }: TodoListProps) => (
   <View
     className={cn(
       'flex flex-row items-center bg-slate-50 rounded-lg',
@@ -37,37 +37,41 @@ const TodoList = ({ item, onDelete, backgroundColor }: TodoListProps) => (
     )}
   >
     <View className="flex flex-row items-center">
-      <View className="w-6 h-6 bg-cyan-300 rounded-md"></View>
+      <View
+        className={`w-6 h-6 rounded-md ${item.isPressed ? '' : 'bg-zinc-200'}`}
+      >
+        {item.isPressed && <Entypo name="check" size={24} color="#67e8f9" />}
+      </View>
       <Text className="ml-3 text-xs">{item.text}</Text>
     </View>
     <Pressable
       className={`w-4 h-4 rounded-full border-cyan-300 border-2 ${
-        backgroundColor === true ? 'bg-cyan-300' : ''
+        item.isPressed ? 'bg-cyan-300' : ''
       }`}
-      onPress={onDelete}
+      onPress={onPress}
     ></Pressable>
   </View>
 )
 
 export default function Todo() {
-  const [selectedId, setSelectedId] = useState<string>()
+  const [pressedId, setPressedId] = useState<string | null>(null)
   const [data, setData] = useState<itemData[]>(initialData)
   const [newTask, setNewTask] = useState<string>('')
 
-  const renderItem = ({ item }: { item: itemData }) => {
-    const backgroundColor = item.id === selectedId ? true : false
+  const togglePress = (id: string) => {
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.id === id ? { ...item, isPressed: !item.isPressed } : item
+      )
+    )
+  }
 
+  const renderItem = ({ item }: { item: itemData }) => {
     const deleteTodo = () => {
       setData((prevData) => prevData.filter((Todo) => Todo.id != item.id))
     }
 
-    return (
-      <TodoList
-        item={item}
-        onDelete={deleteTodo}
-        backgroundColor={backgroundColor}
-      />
-    )
+    return <TodoList item={item} onPress={() => togglePress(item.id)} />
   }
 
   const addTodo = () => {
@@ -79,6 +83,7 @@ export default function Todo() {
     const newTodo: itemData = {
       id: (data.length + 1).toString(),
       text: newTask,
+      isPressed: false,
     }
 
     setData((prevData) => [...prevData, newTodo])
@@ -94,7 +99,7 @@ export default function Todo() {
             data={data}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
-            extraData={selectedId}
+            extraData={pressedId}
             className="mt-7"
           />
         </View>
