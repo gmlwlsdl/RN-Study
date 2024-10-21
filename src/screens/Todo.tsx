@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   SafeAreaView,
   View,
@@ -6,10 +6,13 @@ import {
   FlatList,
   Pressable,
   Alert,
+  ActivityIndicator,
 } from 'react-native'
 import cn from '../utils/cn'
 import { TextInput } from 'react-native-gesture-handler'
 import Entypo from '@expo/vector-icons/Entypo'
+import { Audio } from 'expo-av'
+import { useFocusEffect } from '@react-navigation/native'
 
 type TodoListProps = {
   item: itemData
@@ -54,9 +57,71 @@ const TodoList = ({ item, onPress }: TodoListProps) => (
 )
 
 export default function Todo() {
-  const [pressedId, setPressedId] = useState<string | null>(null)
   const [data, setData] = useState<itemData[]>(initialData)
   const [newTask, setNewTask] = useState<string>('')
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [sound, setSound] = useState<Audio.Sound | null>(null)
+
+  useEffect(() => {
+    const fetchMusicData = async () => {
+      try {
+        const response = await fetch('https://ac-api.vercel.app/api/?time=6PM')
+        const data = await response.json()
+        const newHorizons = data.music.find(
+          (music: any) => music.game === 'New Horizons'
+        )
+
+        if (newHorizons) {
+          setAudioUrl(newHorizons.file)
+          await playSound(newHorizons.file)
+        } else {
+          Alert.alert('New Horizons data not found')
+        }
+      } catch (err) {
+        Alert.alert('Failed to fetch data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchMusicData()
+
+    return () => {
+      unloadSound()
+    }
+  }, [])
+
+  // 포커스가 잃을 때 음악 멈추기
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        unloadSound()
+      }
+    }, [])
+  )
+
+  const playSound = async (url: string) => {
+    if (sound) {
+      await unloadSound() // 이전 소리 중지
+    }
+
+    const { sound: newSound } = await Audio.Sound.createAsync(
+      { uri: url },
+      { shouldPlay: true }
+    )
+
+    setSound(newSound)
+    await newSound.playAsync() // 음악 재생
+  }
+
+  const unloadSound = async () => {
+    if (sound) {
+      await sound.stopAsync()
+      await sound.unloadAsync()
+      setSound(null)
+    }
+  }
 
   const togglePress = (id: string) => {
     setData((prevData) =>
@@ -67,10 +132,6 @@ export default function Todo() {
   }
 
   const renderItem = ({ item }: { item: itemData }) => {
-    const deleteTodo = () => {
-      setData((prevData) => prevData.filter((Todo) => Todo.id != item.id))
-    }
-
     return <TodoList item={item} onPress={() => togglePress(item.id)} />
   }
 
@@ -99,10 +160,10 @@ export default function Todo() {
             data={data}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
-            extraData={pressedId}
             className="mt-7"
           />
         </View>
+
         <View className="flex-row items-center gap-8 shadow-sm">
           <TextInput
             value={newTask}
@@ -110,6 +171,7 @@ export default function Todo() {
             placeholder="Write a task"
             className="flex-grow h-12 bg-white rounded-3xl placeholder:text-center"
           />
+
           <Pressable
             onPress={addTodo}
             className="flex-none w-16 h-16 bg-white rounded-full justify-center items-center"
