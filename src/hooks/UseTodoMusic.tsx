@@ -17,13 +17,11 @@ const useTodoMusic = () => {
           `https://ac-api.vercel.app/api/?time=${time}`
         )
         const data = await response.json()
-        const newHorizons = data.music.find(
-          (music: any) => music.game === 'New Horizons'
-        )
+        const bgm = data.music.find((music: any) => music.game === 'City Folk')
 
-        if (newHorizons) {
-          setAudioUrl(newHorizons.file)
-          await playSound(newHorizons.file)
+        if (bgm) {
+          setAudioUrl(bgm.file)
+          await playSound(bgm.file)
         } else {
           Alert.alert('New Horizons data not found')
         }
