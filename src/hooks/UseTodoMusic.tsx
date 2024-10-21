@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Audio } from 'expo-av'
 import { Alert } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
+import getLocalTime from '../utils/getLocalTime'
 
 const useTodoMusic = () => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
@@ -9,9 +10,12 @@ const useTodoMusic = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null)
 
   useEffect(() => {
+    const time = getLocalTime()
     const fetchMusicData = async () => {
       try {
-        const response = await fetch('https://ac-api.vercel.app/api/?time=6PM')
+        const response = await fetch(
+          `https://ac-api.vercel.app/api/?time=${time}`
+        )
         const data = await response.json()
         const newHorizons = data.music.find(
           (music: any) => music.game === 'New Horizons'
